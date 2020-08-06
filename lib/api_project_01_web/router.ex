@@ -13,16 +13,26 @@ defmodule ApiProject01Web.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", ApiProject01Web do
-    pipe_through :browser
-
-    get "/", PageController, :index
+  pipeline :json_api do
+    plug :accepts, ["json-api"]
+    plug JaSerializer.Deserializer
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", ApiProject01Web do
-  #   pipe_through :api
+  # scope "/", ApiProject01Web do
+  #   pipe_through :browser
+
+  #   get "/", PageController, :index
   # end
+
+  # Other scopes may use custom stacks.
+  scope "/api", ApiProject01Web do
+    pipe_through :json_api
+
+    resources "/projects", ProjectController, only: [:index, :show]
+    # get "/project/:id", ProjectController, :show
+    resources "/documents", DocumentController, only: [:index, :show]
+    # get "/document/:id", DocumentController, :show
+  end
 
   # Enables LiveDashboard only for development
   #
